@@ -1,35 +1,38 @@
-package formatter
+package goformatter
 
-// internal/goformatter/formatter.go
+import (
+	"github.com/fiwon123/goformatter/internal/utils"
+)
 
-func Process(filepath string, dirOutput string, isChecking bool, idDryRun bool, isPretty bool, isInPlace bool, fileType string) {
-	// 	print_msg("-------------------------------------")
-	// 	print_msg("Verifying filepath...")
-	// 	if file_type != "" {
-	// 		formatter_class = get_formatter(file_type)
+func Process(filepath string, dirOutput string, isChecking bool, isDryRun bool, isPretty bool, inPlace bool, fileType string) {
+	utils.PrintMsg("-------------------------------------", false)
+	utils.PrintMsg("Verifying filepath...", false)
+	var formatterClass FormatterInterface
+	ok := false
+	if filepath != "" {
+		formatterClass, ok = GetFormatter(filepath)
 
-	// 		if formatter_class == None {
-	// 			print_error("Invalid parameter file_type: " + file_type)
-	// 		}
-	// 	} else {
-	// 		formatter_class = get_formatter(get_extension(filepath)[1:])
+		if !ok {
+			utils.PrintError("Invalid parameter file_type: " + fileType)
+		}
+	} else {
+		formatterClass, ok = GetFormatter(utils.GetExtension(filepath)[1:])
 
-	// 		if formatter_class == None {
-	// 			print_error("Invalid input file: " + filepath)
-	// 		}
-	// 	}
+		if !ok {
+			utils.PrintError("Invalid input file: " + filepath)
+		}
+	}
 
-	// 	print_msg("Verification passed.")
-	// formatter:
-	// 	BaseFormatter = formatter_class(filepath)
+	utils.PrintMsg("Verification passed.", false)
+	formatterClass.newFormatter(filepath)
 
-	// 	if isChecking {
-	// 		formatter.check()
-	// 	}
-	// 	if isDryRun {
-	// 		formatter.dry_run()
-	// 	}
-	// 	if !isChecking && !isDryRun {
-	// 		formatter.format(dir_output, in_place)
-	// 	}
+	if isChecking {
+		formatterClass.check()
+	}
+	if isDryRun {
+		formatterClass.dryRun()
+	}
+	if !isChecking && !isDryRun {
+		formatterClass.format(dirOutput, inPlace)
+	}
 }

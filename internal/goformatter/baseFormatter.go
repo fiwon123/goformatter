@@ -1,9 +1,20 @@
-package formatter
+package goformatter
 
 type BaseFormatter struct {
 	FilePath      string
 	ExtensionName string
 	Extension     string
+}
+
+type FormatterInterface interface {
+	newFormatter(filepath string)
+	serialize(content string)
+	deserialize(file string) string
+	getFormatName() string
+	getFormatExtension() string
+	check() bool
+	dryRun() bool
+	format(dirOutput string, inPlace bool) bool
 }
 
 func (instance *BaseFormatter) newFormatter(filepath string) {
