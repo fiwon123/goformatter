@@ -4,12 +4,12 @@ type TomlFormatter struct {
 	BaseFormatter
 }
 
-func (instance *TomlFormatter) serialize(content string) {
-
+func (instance *TomlFormatter) serialize(content string) string {
+	return ""
 }
 
-func (instance *TomlFormatter) deserialize(file string) string {
-	return ""
+func (instance *TomlFormatter) deserialize(file string) map[string]interface{} {
+	return map[string]interface{}{}
 }
 
 func init() {

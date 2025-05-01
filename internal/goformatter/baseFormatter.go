@@ -1,5 +1,12 @@
 package goformatter
 
+import (
+	"bufio"
+	"os"
+
+	"github.com/fiwon123/goformatter/internal/utils"
+)
+
 type BaseFormatter struct {
 	FilePath      string
 	ExtensionName string
@@ -8,8 +15,8 @@ type BaseFormatter struct {
 
 type FormatterInterface interface {
 	newFormatter(filepath string)
-	serialize(content string)
-	deserialize(file string) string
+	serialize(content string) string
+	deserialize(file string) map[string]interface{}
 	getFormatName() string
 	getFormatExtension() string
 	check() bool
@@ -21,8 +28,8 @@ func (instance *BaseFormatter) newFormatter(filepath string) {
 	instance.FilePath = filepath
 }
 
-func (instance *BaseFormatter) serialize(content string) {
-
+func (instance *BaseFormatter) serialize(content string) string {
+	return ""
 }
 
 func (instance *BaseFormatter) deserialize(file string) string {
@@ -38,86 +45,114 @@ func (instance *BaseFormatter) getFormatExtension() string {
 }
 
 func (instance *BaseFormatter) check() bool {
-	// print_msg(f"Checking {self.get_format_name()}...")
+	utils.PrintMsg("Checking {self.get_format_name()}...", false)
 
-	// try:
-	// 	with open(self.filepath, "r", encoding="utf-8") as file:
-	// 		content_original = file.read()
-	// 	with open(self.filepath, "r", encoding="utf-8") as file:
-	// 		content = self._deserialize(file)
-	// except Exception as e:
-	// 	print_error(f"Invalid {self.get_format_name()}: {e}")
+	file, err := os.Open(instance.FilePath)
+	if err != nil {
+		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
+		return false
+	}
+	defer file.Close()
 
-	// default_comma = ", "
-	// default_colon = " : "
+	contentOriginal := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		contentOriginal = scanner.Text()
+	}
 
-	// preview = self._serialize(content, indent=4, separators=(default_comma, default_colon))
-	// if (content_original != preview):
-	// 	print_warning(f"{self.get_format_name()} is not correct formatted. But syntax is OK.")
-	// 	return False
+	content := instance.deserialize(contentOriginal)
 
-	// print_msg(f"{self.get_format_name()} is already formatted.", True)
+	preview := instance.serialize(content)
+	if contentOriginal != preview {
+		utils.PrintWarning(instance.getFormatName() + " is not correct formatted. But syntax is OK.")
+		return false
+	}
+
+	utils.PrintMsg(instance.getFormatName()+" is already formatted.", true)
 
 	return true
 }
 
 func (instance *BaseFormatter) dryRun() bool {
-	// print_msg(f"{self.get_format_name()} Preview:")
+	utils.PrintMsg(instance.getFormatName()+" Preview:", false)
+
+	file, err := os.Open(instance.FilePath)
+	if err != nil {
+		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
+		return false
+	}
+	defer file.Close()
+
+	contentOriginal := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		contentOriginal = scanner.Text()
+	}
+
+	content := instance.deserialize(contentOriginal)
+
+	utils.PrintMsg("Deserialized "+instance.getFormatName()+" file.", false)
 
 	// try:
-	// 	with open(self.filepath, "r", encoding="utf-8") as file:
-	// 		content = self._deserialize(file)
-	// except Exception as e:
-	// 	print_error(f"Invalid {self.get_format_name()}: {e}")
-
-	// print_msg(f"Deserialized {self.get_format_name()} file.")
-
-	// default_comma = ", "
-	// default_colon = " : "
-
-	// try:
-	// 	print_msg(self._serialize(content, indent=4, separators=(default_comma, default_colon)))
+	utils.PrintMsg(instance.serialize(content), false)
 	// except TypeError as e:
 	// 	print_error(f"Unable to serialize data to {self.get_format_name()}: {e}")
 
 	return true
 }
 
-func (instanec *BaseFormatter) format(dirOutput string, inPlace bool) bool {
-	// print_msg(f"Formatting {self.get_format_name()}...")
+func (instance *BaseFormatter) format(dirOutput string, inPlace bool) bool {
+	utils.PrintMsg("Formatting "+instance.getFormatName()+"...", false)
 
-	// try:
-	// 	with open(self.filepath, "r", encoding="utf-8") as file:
-	// 		content = self._deserialize(file)
-	// except Exception as e:
-	// 	print_error(f"Invalid {self.get_format_name()}: {e}")
+	file, err := os.Open(instance.FilePath)
+	if err != nil {
+		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
+		return false
+	}
+	defer file.Close()
 
-	// print_msg(f"Deserialized {self.get_format_name()} file.")
-	// default_comma = ", "
-	// default_colon = " : "
+	contentOriginal := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		contentOriginal = scanner.Text()
+	}
 
-	// if (in_place):
-	// 	output = self.filepath
-	// else:
-	// 	if (dir_output != None):
-	// 		output = dir_output
-	// 		create_dir(output)
-	// 		print_msg(f"Created output folder {output}")
-	// 	else:
-	// 		output = get_dir_path(self.filepath)
-	// 		output = join_paths(output, "output")
-	// 		create_dir(output)
-	// 		print_msg(f"Created output folder {output}")
+	content := instance.deserialize(contentOriginal)
 
-	// 	output = join_paths(output, get_file_name(self.filepath) + "_formatted" + self.get_format_extension())
+	utils.PrintMsg("Deserialized "+instance.getFormatName()+" file.", false)
 
-	// try:
-	// 	with open(output, "w", encoding="utf-8") as file:
-	// 		file.write(self._serialize(content, indent=4, separators=(default_comma, default_colon)))
-	// except TypeError as e:
-	// 	print_error(f"Unable to serialize data to {self.get_format_name()}: {e}")
+	output := ""
+	if inPlace {
+		output = instance.FilePath
+	} else {
+		if dirOutput != "" {
+			output = dirOutput
+			utils.CreateDir(output)
+			utils.PrintMsg("Created output folder "+output, false)
+		} else {
+			output = utils.GetDirPath(instance.FilePath)
+			output = utils.JoinPaths(output, "output")
+			utils.CreateDir(output)
+			utils.PrintMsg("Created output folder "+output, false)
+		}
 
-	// print_msg(f"{self.get_format_name()} completed.", True)
+		output = utils.JoinPaths(output, utils.GetFileName(instance.FilePath)+"_formatted"+instance.getFormatExtension())
+	}
+
+	file, err = os.Open(instance.FilePath)
+	if err != nil {
+		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
+		return false
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(instance.serialize(content))
+	if err != nil {
+		utils.PrintError("Unable to serialize data to " + instance.getFormatName() + ": " + err.Error())
+		return false
+	}
+
+	utils.PrintMsg(instance.getFormatName()+" completed.", true)
 
 	return true
 
