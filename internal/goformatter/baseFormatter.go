@@ -15,7 +15,7 @@ type BaseFormatter struct {
 
 type FormatterInterface interface {
 	newFormatter(filepath string)
-	serialize(content string) string
+	serialize(content map[string]interface{}) string
 	deserialize(file string) map[string]interface{}
 	getFormatName() string
 	getFormatExtension() string

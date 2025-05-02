@@ -2,6 +2,7 @@ package goformatter
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 )
 
@@ -9,8 +10,13 @@ type JsonFormatter struct {
 	BaseFormatter
 }
 
-func (instance *JsonFormatter) serialize(content string) string {
-	return ""
+func (instance *JsonFormatter) serialize(content map[string]interface{}) string {
+	jsonData, err := json.Marshal(content)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return string(jsonData)
 }
 
 func (instance *JsonFormatter) deserialize(file string) map[string]interface{} {
