@@ -1,7 +1,6 @@
 package goformatter
 
 import (
-	"bufio"
 	"os"
 
 	"github.com/fiwon123/goformatter/internal/utils"
@@ -47,18 +46,13 @@ func (instance *BaseFormatter) getFormatExtension() string {
 func (instance *BaseFormatter) check(f FormatterInterface) bool {
 	utils.PrintMsg("Checking "+instance.getFormatName()+"...", false)
 
-	file, err := os.Open(instance.FilePath)
+	contentOriginalByte, err := os.ReadFile(instance.FilePath)
 	if err != nil {
 		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
 		return false
 	}
-	defer file.Close()
 
-	contentOriginal := ""
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		contentOriginal += scanner.Text()
-	}
+	contentOriginal := string(contentOriginalByte)
 
 	content := f.deserialize(contentOriginal)
 
@@ -76,18 +70,13 @@ func (instance *BaseFormatter) check(f FormatterInterface) bool {
 func (instance *BaseFormatter) dryRun(f FormatterInterface) bool {
 	utils.PrintMsg(instance.getFormatName()+" Preview:", false)
 
-	file, err := os.Open(instance.FilePath)
+	contentOriginalByte, err := os.ReadFile(instance.FilePath)
 	if err != nil {
 		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
 		return false
 	}
-	defer file.Close()
 
-	contentOriginal := ""
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		contentOriginal += scanner.Text()
-	}
+	contentOriginal := string(contentOriginalByte)
 
 	content := f.deserialize(contentOriginal)
 
@@ -101,18 +90,13 @@ func (instance *BaseFormatter) dryRun(f FormatterInterface) bool {
 func (instance *BaseFormatter) format(f FormatterInterface, dirOutput string, inPlace bool) bool {
 	utils.PrintMsg("Formatting "+instance.getFormatName()+"...", false)
 
-	file, err := os.Open(instance.FilePath)
+	contentOriginalByte, err := os.ReadFile(instance.FilePath)
 	if err != nil {
 		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
 		return false
 	}
-	defer file.Close()
 
-	contentOriginal := ""
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		contentOriginal += scanner.Text()
-	}
+	contentOriginal := string(contentOriginalByte)
 
 	println("contentOriginal: " + contentOriginal)
 

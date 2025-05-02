@@ -11,7 +11,7 @@ type JsonFormatter struct {
 }
 
 func (instance *JsonFormatter) serialize(content map[string]interface{}) string {
-	jsonData, err := json.Marshal(content)
+	jsonData, err := json.MarshalIndent(content, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 		return ""
