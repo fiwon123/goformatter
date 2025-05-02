@@ -9,14 +9,14 @@ func Process(filepath string, dirOutput string, isChecking bool, isDryRun bool, 
 	utils.PrintMsg("Verifying filepath...", false)
 	var formatterClass FormatterInterface
 	ok := false
-	if filepath != "" {
-		formatterClass, ok = GetFormatter(filepath)
+	if fileType != "" {
+		formatterClass, ok = GetFormatter(fileType)
 
 		if !ok {
 			utils.PrintError("Invalid parameter file_type: " + fileType)
 		}
 	} else {
-		formatterClass, ok = GetFormatter(utils.GetExtension(filepath)[1:])
+		formatterClass, ok = GetFormatter(utils.GetExtension(filepath))
 
 		if !ok {
 			utils.PrintError("Invalid input file: " + filepath)
@@ -27,12 +27,12 @@ func Process(filepath string, dirOutput string, isChecking bool, isDryRun bool, 
 	formatterClass.newFormatter(filepath)
 
 	if isChecking {
-		formatterClass.check()
+		formatterClass.check(formatterClass)
 	}
 	if isDryRun {
-		formatterClass.dryRun()
+		formatterClass.dryRun(formatterClass)
 	}
 	if !isChecking && !isDryRun {
-		formatterClass.format(dirOutput, inPlace)
+		formatterClass.format(formatterClass, dirOutput, inPlace)
 	}
 }

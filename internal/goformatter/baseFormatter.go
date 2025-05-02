@@ -19,21 +19,21 @@ type FormatterInterface interface {
 	deserialize(file string) map[string]interface{}
 	getFormatName() string
 	getFormatExtension() string
-	check() bool
-	dryRun() bool
-	format(dirOutput string, inPlace bool) bool
+	check(f FormatterInterface) bool
+	dryRun(f FormatterInterface) bool
+	format(f FormatterInterface, dirOutput string, inPlace bool) bool
 }
 
 func (instance *BaseFormatter) newFormatter(filepath string) {
 	instance.FilePath = filepath
 }
 
-func (instance *BaseFormatter) serialize(content string) string {
+func (instance *BaseFormatter) serialize(content map[string]interface{}) string {
 	return ""
 }
 
-func (instance *BaseFormatter) deserialize(file string) string {
-	return ""
+func (instance *BaseFormatter) deserialize(file string) map[string]interface{} {
+	return map[string]interface{}{}
 }
 
 func (instance *BaseFormatter) getFormatName() string {
@@ -44,8 +44,8 @@ func (instance *BaseFormatter) getFormatExtension() string {
 	return instance.Extension
 }
 
-func (instance *BaseFormatter) check() bool {
-	utils.PrintMsg("Checking {self.get_format_name()}...", false)
+func (instance *BaseFormatter) check(f FormatterInterface) bool {
+	utils.PrintMsg("Checking "+instance.getFormatName()+"...", false)
 
 	file, err := os.Open(instance.FilePath)
 	if err != nil {
@@ -57,12 +57,12 @@ func (instance *BaseFormatter) check() bool {
 	contentOriginal := ""
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		contentOriginal = scanner.Text()
+		contentOriginal += scanner.Text()
 	}
 
-	content := instance.deserialize(contentOriginal)
+	content := f.deserialize(contentOriginal)
 
-	preview := instance.serialize(content)
+	preview := f.serialize(content)
 	if contentOriginal != preview {
 		utils.PrintWarning(instance.getFormatName() + " is not correct formatted. But syntax is OK.")
 		return false
@@ -73,7 +73,7 @@ func (instance *BaseFormatter) check() bool {
 	return true
 }
 
-func (instance *BaseFormatter) dryRun() bool {
+func (instance *BaseFormatter) dryRun(f FormatterInterface) bool {
 	utils.PrintMsg(instance.getFormatName()+" Preview:", false)
 
 	file, err := os.Open(instance.FilePath)
@@ -86,22 +86,19 @@ func (instance *BaseFormatter) dryRun() bool {
 	contentOriginal := ""
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		contentOriginal = scanner.Text()
+		contentOriginal += scanner.Text()
 	}
 
-	content := instance.deserialize(contentOriginal)
+	content := f.deserialize(contentOriginal)
 
 	utils.PrintMsg("Deserialized "+instance.getFormatName()+" file.", false)
 
-	// try:
-	utils.PrintMsg(instance.serialize(content), false)
-	// except TypeError as e:
-	// 	print_error(f"Unable to serialize data to {self.get_format_name()}: {e}")
+	utils.PrintMsg(f.serialize(content), false)
 
 	return true
 }
 
-func (instance *BaseFormatter) format(dirOutput string, inPlace bool) bool {
+func (instance *BaseFormatter) format(f FormatterInterface, dirOutput string, inPlace bool) bool {
 	utils.PrintMsg("Formatting "+instance.getFormatName()+"...", false)
 
 	file, err := os.Open(instance.FilePath)
@@ -114,10 +111,12 @@ func (instance *BaseFormatter) format(dirOutput string, inPlace bool) bool {
 	contentOriginal := ""
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		contentOriginal = scanner.Text()
+		contentOriginal += scanner.Text()
 	}
 
-	content := instance.deserialize(contentOriginal)
+	println("contentOriginal: " + contentOriginal)
+
+	content := f.deserialize(contentOriginal)
 
 	utils.PrintMsg("Deserialized "+instance.getFormatName()+" file.", false)
 
@@ -139,14 +138,7 @@ func (instance *BaseFormatter) format(dirOutput string, inPlace bool) bool {
 		output = utils.JoinPaths(output, utils.GetFileName(instance.FilePath)+"_formatted"+instance.getFormatExtension())
 	}
 
-	file, err = os.Open(instance.FilePath)
-	if err != nil {
-		utils.PrintError("Invalid " + instance.getFormatName() + ": " + err.Error())
-		return false
-	}
-	defer file.Close()
-
-	_, err = file.WriteString(instance.serialize(content))
+	err = os.WriteFile(output, []byte(f.serialize(content)), 0644)
 	if err != nil {
 		utils.PrintError("Unable to serialize data to " + instance.getFormatName() + ": " + err.Error())
 		return false

@@ -31,7 +31,7 @@ func (instance *JsonFormatter) deserialize(file string) map[string]interface{} {
 }
 
 func init() {
-	Register(".json", &JsonFormatter{
+	Register("json", &JsonFormatter{
 		BaseFormatter: BaseFormatter{
 			FilePath:      "",
 			ExtensionName: "json",

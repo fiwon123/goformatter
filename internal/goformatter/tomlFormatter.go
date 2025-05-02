@@ -32,7 +32,7 @@ func (instance *TomlFormatter) deserialize(file string) map[string]interface{} {
 }
 
 func init() {
-	Register(".toml", &TomlFormatter{
+	Register("toml", &TomlFormatter{
 		BaseFormatter: BaseFormatter{
 			FilePath:      "",
 			ExtensionName: "toml",

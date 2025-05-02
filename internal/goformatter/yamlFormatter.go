@@ -32,7 +32,7 @@ func (instance *YamlFormatter) deserialize(file string) map[string]interface{} {
 }
 
 func init() {
-	Register(".yaml", &YamlFormatter{
+	Register("yaml", &YamlFormatter{
 		BaseFormatter: BaseFormatter{
 			FilePath:      "",
 			ExtensionName: "yaml",

@@ -2,6 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 func PrintError(msg string) {
@@ -11,6 +14,7 @@ func PrintError(msg string) {
 }
 
 func PrintWarning(msg string) {
+	fmt.Println("⚠️ [WARNING] " + msg)
 	// typer.echo(f"⚠️  [WARNING] {msg}")
 	// get_logger().save_log(f"[WARNING] {msg}")
 }
@@ -29,42 +33,48 @@ func PrintMsg(msg string, enableIcon bool) {
 // 	console.print(Panel(message, title="[red]Error[/red]", border_style="red"))
 // }
 
-func GetExtension(filepath string) string {
-	// return os.path.splitext(filepath)[1]
-	return ""
+func GetExtension(path string) string {
+	_, file := filepath.Split(path)
+	fileSplit := strings.Split(file, ".")
+	return fileSplit[1]
 }
 
-func GetDirPath(filepath string) string {
-	// return os.path.dirname(filepath)
-	return ""
+func GetDirPath(path string) string {
+	dirPath, _ := filepath.Split(path)
+	return dirPath
 }
 
-func GetFileName(filepath string) string {
-	// return os.path.splitext(os.path.basename(filepath))[0]
-	return ""
+func GetFileName(path string) string {
+	_, file := filepath.Split(path)
+	fileSplit := strings.Split(file, ".")
+	return fileSplit[0]
 }
 
-func CreateDir(filepath string) {
-	// if not os.path.exists(filepath):
-	// 	os.makedirs(filepath)
+func CreateDir(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// Create a single directory
+		err := os.MkdirAll(path, 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
-func GetPath(path string) string {
-	// return Path(path)
-	return ""
-}
+// func GetPath(path string) string {
+// 	// return Path(path)
+// 	return ""
+// }
 
 func JoinPaths(basePath string, subPath string) string {
-	// return os.path.join(base_path, sub_path)
-	return ""
+	return filepath.Join(basePath, subPath)
 }
 
-func DirPath(filepath string) string {
-	// if os.path.exists(filepath):
-	// 	return filepath
-	// else:
-	// 	error_box("Missing argument '[bold red]FILEPATH[/]'.")
-	// 	print_error(f"File '{filepath}' not found.")
+// func DirPath(path string) string {
+// 	// if os.path.exists(filepath):
+// 	// 	return filepath
+// 	// else:
+// 	// 	error_box("Missing argument '[bold red]FILEPATH[/]'.")
+// 	// 	print_error(f"File '{filepath}' not found.")
 
-	return ""
-}
+// 	return ""
+// }
