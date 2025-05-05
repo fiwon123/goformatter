@@ -21,6 +21,7 @@ goformatter --help
 ```
 
 ## 📁 Project Structure
+```text
 goformatter/
 ├── cmd/                
 │   └── root.go           
@@ -43,6 +44,7 @@ goformatter/
 ├── go.sum
 ├── LICENSE     
 └── README.md
+```text
 
 ## 🧪 Running Tests
 ```bash
