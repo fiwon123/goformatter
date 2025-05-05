@@ -7,6 +7,8 @@ import (
 	"os"
 
 	formatter "github.com/fiwon123/goformatter/internal/goformatter"
+	logger "github.com/fiwon123/goformatter/internal/logger"
+	"github.com/fiwon123/goformatter/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -20,13 +22,14 @@ var rootCmd = &cobra.Command{
 		filepath, _ := flags.GetString("file")
 		fileType, _ := flags.GetString("type")
 		dirOutput, _ := flags.GetString("output")
-		// disableLog, _ := flags.GetBool("disable-logs")
+		disableLog, _ := flags.GetBool("disable-logs")
 		check, _ := flags.GetBool("check")
 		dryRun, _ := flags.GetBool("dry-run")
 		inPlace, _ := flags.GetBool("in-place")
 		pretty, _ := flags.GetBool("pretty")
 
-		// set_logger(FormatterLogger(disable_log, pretty))
+		utils.CreateDir("./logs/")
+		logger.NewLogger(disableLog)
 
 		formatter.Process(filepath, dirOutput, check, dryRun, pretty, inPlace, fileType)
 	},

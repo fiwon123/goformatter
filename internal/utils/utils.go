@@ -5,18 +5,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/fiwon123/goformatter/internal/logger"
 )
 
 func PrintError(msg string) {
 	fmt.Println("❌ [ERROR] " + msg)
-	// get_logger().save_log(f"[ERROR] {msg}")
-	// raise typer.Exit(1)
+	logger.SaveLog("[ERROR] " + msg)
+	panic("Something goes wrong!")
 }
 
 func PrintWarning(msg string) {
 	fmt.Println("⚠️ [WARNING] " + msg)
-	// typer.echo(f"⚠️  [WARNING] {msg}")
-	// get_logger().save_log(f"[WARNING] {msg}")
+	logger.SaveLog("[WARNING] " + msg)
 }
 
 func PrintMsg(msg string, enableIcon bool) {
@@ -26,12 +27,8 @@ func PrintMsg(msg string, enableIcon bool) {
 		fmt.Println(msg)
 	}
 
-	// get_logger().save_log(msg)
+	logger.SaveLog(msg)
 }
-
-// func errorBox(message string){
-// 	console.print(Panel(message, title="[red]Error[/red]", border_style="red"))
-// }
 
 func GetExtension(path string) string {
 	_, file := filepath.Split(path)

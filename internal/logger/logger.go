@@ -1,43 +1,34 @@
 package logger
 
+import (
+	"log"
+	"os"
+	"time"
+)
+
+var instance Logger
+
 type Logger struct {
 	DisableLog bool
+	LogName    string
 }
 
-func (instance *Logger) newLogger(disableLog bool, pretty bool) {
-
-	// instance.DisableLog = disableLog
-
-	// if pretty {
-	// 	logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-	// 	instance.logger = logging.getLogger("rich")
-	// } else {
-	// 	instance.logger = logging.getLogger("log")
-	// }
-
-	// formatter = logging.Formatter(
-	// 	"%(asctime)s - %(levelname)s - %(message)s"
-	// )
-
-	// instance.logger.setLevel(logging.INFO)
-
-	// if !disadisableLog {
-	// 	log_dir = get_path("logs")
-	// 	log_dir.mkdir(exist_ok=True)
-	// 	timestamp = datetime.datetime.now().strftime("%Y%m%d_%Hh%M")
-	// 	file_handler = logging.FileHandler(log_dir / f"formatter_{timestamp}.log")
-	// 	file_handler.setFormatter(formatter)
-	// 	self.logger.addHandler(file_handler)
-	// }
+func NewLogger(disableLog bool) {
+	instance = Logger{
+		DisableLog: disableLog,
+		LogName:    "./logs/" + time.Now().Format("2006.01.02_1504") + ".log"}
 }
 
-func (instance *Logger) saveLog(msg string) {
-	// if instance.logger == None || instance.DisableLog {
-	// 	return
-	// }
-	// instance.logger.info(msg)
-}
+func SaveLog(msg string) {
+	if instance.DisableLog {
+		return
+	}
 
-func (instance *Logger) getLogger() {
-	// return instance.logger
+	f, err := os.OpenFile(instance.LogName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+	log.Println(msg)
 }
